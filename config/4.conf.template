@@ -3,7 +3,7 @@ server {
   listen 80 ;
   http2 on ;
 
-  access_log /var/log/nginx/${domain_home}.access.log main2 ;
+  access_log /var/log/nginx/${domain_home}.access.log main2 if=$loggable;
 
   server_name ${domain_home} ;
 

@@ -3,8 +3,6 @@ server {
   server_name ${domain_draw} ;
 
   location / {
-    auth_basic_user_file /passwd ;
-    auth_basic "Restricted" ;
 
     return 301 https://$host$request_uri ;
   }
@@ -21,6 +19,8 @@ server {
 
   proxy_buffering off;
 
+    auth_basic_user_file /passwd ;
+    auth_basic "Restricted" ;
 
 
   location /.well-known/acme-challenge/ {
@@ -30,9 +30,6 @@ server {
   }
 
   location / {
-    auth_basic_user_file /passwd ;
-    auth_basic "Restricted" ;
-
     proxy_pass https://${service_draw}/;
 
     proxy_ssl_verify on;

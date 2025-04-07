@@ -17,7 +17,7 @@ server {
   listen 80;
   listen 443 ssl ;
 
-  access_log /var/log/nginx/${domain_ha}.access.log main2 ;
+  access_log /var/log/nginx/${domain_ha}.access.log main2 if=$loggable ;
 
   server_name ${domain_ha} ;
 
