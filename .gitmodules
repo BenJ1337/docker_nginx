@@ -1,0 +1,3 @@
+[submodule "nginx-html"]
+	path = nginx-html
+	url = git@github.com:BenJ1337/nginx-html.git

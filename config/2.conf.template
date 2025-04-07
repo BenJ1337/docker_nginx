@@ -1,0 +1,58 @@
+geo $ban_ip {
+  default 0 ;
+  include /f2b_data/banlist.txt ;
+}
+
+map $ban_ip $block {
+  1 1 ;
+  default 0 ;
+}
+
+map $http_upgrade $connection_upgrade {
+    default upgrade ;
+    ''      close ;
+}
+
+server {
+  listen 80;
+  listen 443 ssl ;
+
+  access_log /var/log/nginx/${domain_ha}.access.log main2 ;
+
+  server_name ${domain_ha} ;
+
+  http2 on ;
+
+  if ($block) {
+    return 403 ;
+  }
+
+  location /.well-known/acme-challenge/ {
+    proxy_pass http://certbots;
+  }
+
+  location / {
+    proxy_pass https://${service_ha}/ ;
+    proxy_buffering off;
+
+    proxy_set_header Host $host;
+    proxy_redirect http:// https://; 
+    proxy_http_version 1.1;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection $connection_upgrade;
+
+    if ($scheme != "https") {
+      return 301 https://$server_name$request_uri ;
+    }
+
+    proxy_ssl_verify on ;
+    proxy_ssl_trusted_certificate /my-ca/root.crt ;
+    proxy_ssl_server_name on ;
+
+    # https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP
+    add_header Content-Security-Policy "script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self';" ;
+
+  }
+
+}

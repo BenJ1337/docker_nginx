@@ -1,0 +1,34 @@
+services:
+  nginx:
+    container_name: nginx
+    image: my-nginx #nginx:1.27
+    build: ./image
+    restart: unless-stopped
+    volumes:
+    - ./config/:/etc/nginx/templates/:ro
+    - ./passwd:/passwd:ro
+    - ./ca.crt:/my-ca/root.crt:ro
+    - /etc/localtime:/etc/localtime:ro
+    - ./nginx-html/:/usr/share/nginx/html/:ro
+    - nginx_certs:/etc/ssl/:ro
+    - nginx_logs:/var/log/nginx/
+    - f2b:/f2b_data/
+    ports:
+    - 80:80
+    - 443:443
+    networks:
+      certbot-network:
+        ipv4_address: 172.16.111.20
+    env_file: ./.env
+networks:
+  certbot-network:
+    external: true
+volumes:
+  nginx_html:
+    external: true
+  nginx_certs:
+    external: true
+  nginx_logs:
+    external: true
+  f2b:
+    external: true
