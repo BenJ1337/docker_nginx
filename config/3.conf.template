@@ -3,9 +3,6 @@ server {
   server_name ${domain_draw} ;
 
   location / {
-    auth_basic_user_file /passwd ;
-    auth_basic "Restricted" ;
-
     return 301 https://$host$request_uri ;
   }
 }
@@ -17,11 +14,13 @@ server {
 
   server_name ${domain_draw} ;
 
+  if ($block_ips) {
+    return 403 ;
+  }
+
   http2 on ;
 
   proxy_buffering off;
-
-
 
   location /.well-known/acme-challenge/ {
     proxy_pass http://certbots;

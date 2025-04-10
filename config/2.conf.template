@@ -1,13 +1,3 @@
-geo $ban_ip {
-  default 0 ;
-  include /f2b_data/banlist.txt ;
-}
-
-map $ban_ip $block {
-  1 1 ;
-  default 0 ;
-}
-
 map $http_upgrade $connection_upgrade {
     default upgrade ;
     ''      close ;
@@ -23,7 +13,7 @@ server {
 
 #  http2 on ;
 
-  if ($block) {
+  if ($block_ips) {
     return 403 ;
   }
 
