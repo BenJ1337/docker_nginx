@@ -8,9 +8,11 @@ access_log /var/log/nginx/acc.log main2 ;
 
 map $status $loggable {
     default 1;
-    403 0;
+    101 0;
+    200 0;
+#    403 0;
     401 0;
-    404 0;
+#    404 0;
 }
 
 upstream certbots {
@@ -19,6 +21,13 @@ upstream certbots {
 }
   
 server_tokens off ;
+
+map $http_user_agent $blocked_ua {
+    default 1;
+    "~^Mozilla/5\.0 \(Linux; Android 14; SM-S928B" 0;
+    "~^Home Assistant/[0-9]+\.[0-9]+\.[0-9]+-[0-9]+ \(Android 14; SM-S928B\)$" 0;
+    "~Firefox" 0;
+}
 
 ssl_prefer_server_ciphers on ;
 ssl_ciphers "EECDH+AESGCM:!EDH+AESGCM:!AES256+EECDH:!AES256+EDH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4" ;
