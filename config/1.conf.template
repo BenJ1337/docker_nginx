@@ -45,7 +45,11 @@ add_header Content-Security-Policy "frame-ancestors 'none';";
 add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
 
 server {
-    listen 80;
-    server_name _;
-    return 418;
+  listen 80 default_server;
+  listen 443 ssl default_server;
+  server_name _;
+  location / {
+    default_type text/html;
+    return 418 "<html><title>I'm a teapot</title><body><h1>418 I'm a teapot</h1><p>The server refuses to brew coffee because it is, permanently, a teapot.</p></body></html>";
+  }
 }
