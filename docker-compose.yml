@@ -1,7 +1,7 @@
 services:
   nginx:
     container_name: nginx
-    image: my-nginx #nginx:1.27
+    image: custom-nginx
     build: ./image
     restart: unless-stopped
     volumes:
