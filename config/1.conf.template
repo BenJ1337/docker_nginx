@@ -1,28 +1,23 @@
-log_format main2 '$http_x_forwarded_for - $remote_user [$time_local] $remote_addr '
-  '"$request_method $scheme://$host$request_uri $server_protocol" '
-  '$status $body_bytes_sent "$http_referer" '
-  '"$http_user_agent" $request_time' ;
+log_format complete       '$http_x_forwarded_for - $remote_user [$time_local] $remote_addr "$request_method $scheme://$host$request_uri $server_protocol" $status $body_bytes_sent "$http_referer" "$http_user_agent" $request_time' ;
+log_format ha_ban         '$time_local ip=$remote_addr uri=$request_uri' ;
+log_format basic_auth_ban '$time_local ip=$remote_addr status=$status' ;
 
 error_log /var/log/nginx/error.log ;
-access_log /var/log/nginx/acc.log main2 ;
+access_log /var/log/nginx/access.log complete;
 
 map $status $loggable {
     default 1;
 #    101 0;
 #    200 0;
+    418 0;
     403 0;
-    401 0;
+#    401 0;
     404 0;
 }
 
-geo $ban_ip {
-  default 0 ;
-  include /f2b_data/banlist.txt ;
-}
-
-map $ban_ip $block_ips {
-  1 1 ;
-  default 0 ;
+map $status $log_401 {
+  default 0;
+  401     1;
 }
 
 upstream certbots {
@@ -31,13 +26,6 @@ upstream certbots {
 }
   
 server_tokens off ;
-
-map $http_user_agent $blocked_ua {
-    default 1;
-    "~^Mozilla/5\.0 \(Linux; Android 14; SM-S928B" 0;
-    "~^Home Assistant/[0-9]+\.[0-9]+\.[0-9]+-[0-9]+ \(Android 14; SM-S928B\)$" 0;
-    "~Firefox" 0;
-}
 
 ssl_prefer_server_ciphers on ;
 ssl_ciphers "EECDH+AESGCM:!EDH+AESGCM:!AES256+EECDH:!AES256+EDH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4" ;
@@ -56,3 +44,8 @@ add_header Content-Security-Policy "frame-ancestors 'none';";
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Strict-Transport-Security
 add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
 
+server {
+    listen 80;
+    server_name _;
+    return 418;
+}
