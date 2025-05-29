@@ -45,7 +45,8 @@ add_header Content-Security-Policy "frame-ancestors 'none';";
 add_header Strict-Transport-Security "max-age=31536000; includeSubdomains; preload";
 
 server {
-    listen 80;
-    server_name _;
-    return 418;
+  listen 80 default_server ;
+  listen 443 ssl default_server ;
+  server_name _ ;
+  return 418 ;
 }
