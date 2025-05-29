@@ -1,6 +1,19 @@
+geo $ban_ip_draw {
+  default 0 ;
+  include /f2b_data/draw-banlist.txt ;
+}
+
+map $ban_ip_draw $block_ips_draw {
+  1 1 ;
+  default 0 ;
+}
+
 server {
   listen 80 ;
   server_name ${domain_draw} ;
+
+  access_log /var/log/nginx/${domain_draw}.access.log complete if=$loggable;
+  access_log /var/log/nginx/${domain_draw}.ban.log basic_auth_ban if=$log_401;
 
   location / {
     return 301 https://$host$request_uri ;
@@ -9,18 +22,16 @@ server {
 
 server {
   listen 443 ssl ;
+  http2 on ;
 
-  access_log /var/log/nginx/${domain_draw}.access.log main2 if=$loggable;
+  access_log /var/log/nginx/${domain_draw}.access.log complete if=$loggable;
+  access_log /var/log/nginx/${domain_draw}.ban.log basic_auth_ban if=$log_401;
 
   server_name ${domain_draw} ;
 
-  if ($block_ips) {
+  if ($block_ips_draw) {
     return 403 ;
   }
-
-  http2 on ;
-
-  proxy_buffering off;
 
   location /.well-known/acme-challenge/ {
     proxy_pass http://certbots;
@@ -36,7 +47,6 @@ server {
 
     proxy_ssl_verify on;
     proxy_ssl_trusted_certificate /my-ca/root.crt;
-    proxy_ssl_server_name on;
   }
 
 }
