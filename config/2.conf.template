@@ -63,8 +63,14 @@ server {
  #   proxy_ssl_server_name on ;
 
     # https://developer.mozilla.org/en-US/docs/Web/HTTP/Guides/CSP
-    add_header Content-Security-Policy "script-src 'self' 'unsafe-inline'; media-src 'self' data:; img-src 'self' https://basemaps.cartocdn.com data:; style-src 'self' 'unsafe-inline'; default-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self';" ;
-
+    add_header Content-Security-Policy "
+      script-src 'self' 'unsafe-inline' 'unsafe-eval'; 
+      media-src 'self' data:; 
+      img-src 'self' https://brands.home-assistant.io https://basemaps.cartocdn.com data:; 
+      style-src 'self' 'unsafe-inline'; 
+      default-src 'self'; 
+      object-src 'none'; 
+      base-uri 'none'; 
+      frame-ancestors 'self';" ;
   }
-
 }
